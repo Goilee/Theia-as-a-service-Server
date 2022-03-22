@@ -2,7 +2,6 @@ import socket
 from argparse import ArgumentParser
 
 parser = ArgumentParser(description='Echo server.')
-
 parser.add_argument('-a', '--address', help='host ip address', default='localhost')
 parser.add_argument('-p', '--port', help='port to listen', default='3000')
 
@@ -15,14 +14,19 @@ s.bind((HOST, PORT))
 s.listen(1)
 print(f'Listening to {HOST}:{PORT}');
 
-conn, addr = s.accept()
-print(f'Connected by {addr}')
+try:
+    while 1:
+        conn, addr = s.accept()
+        print(f'Connected by {addr}')
 
-while 1:
-    data = conn.recv(1024)
-    print(f'Recieved data: {data}')
-    if not data:
-        break
-    conn.sendall(data)
-
-conn.close()
+        while 1:
+            data = conn.recv(1024)
+            print(f'Recieved data: {data}')
+            if not data:
+                break
+            conn.sendall(data)
+        
+        print(f'Connection closed: {addr}')
+        conn.close()
+except KeyboardInterrupt:
+    pass
