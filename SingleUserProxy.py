@@ -29,14 +29,13 @@ class SingleUserProxy:
         self._socketsToWrite.remove(socket)
         
         print(f'Closed connection with {self._addresses[socket]}')
-        if not self._socketsToWrite:
-            return False
-        else:
-            return True
+        return False if not self._socketsToWrite else True
     
-    def _handleMessage(self, fromSocket, toSocket):
-        if not (fromSocket is self._socket1 and toSocket is self._socket2 or fromSocket is self._socket2 and toSocket is self._socket1):
-            raise ValueError("Incorrect sockets' values")
+    def _handleMessage(self, fromSocket):
+        if not (fromSocket is self._socket1 or fromSocket is self._socket2):
+            raise ValueError("Incorrect socket value")
+        
+        toSocket = self._socket2 if fromSocket is self._socket1 else self._socket1
         
         message = b''
         connClosed = False
@@ -52,7 +51,8 @@ class SingleUserProxy:
         except BlockingIOError:
             pass
         print(f'Message recieved from {self._addresses[fromSocket]}: {len(message)}')
-        self._dataToSend[toSocket].put(message)
+        if toSocket in self._dataToSend.keys():
+            self._dataToSend[toSocket].put(message)
         return not connClosed
     
     def _sendMessageFromQueue(self, toSocket):
@@ -79,10 +79,7 @@ class SingleUserProxy:
             readyToRead, readyToWrite, inError = select(self._socketsToRead, self._socketsToWrite, [], 60)
             
             for fromSocket in readyToRead:
-                if fromSocket is self._socket1:
-                    connAlive = self._handleMessage(self._socket1, self._socket2)
-                else:
-                    connAlive = self._handleMessage(self._socket2, self._socket1)
+                connAlive = self._handleMessage(fromSocket)
                 if not connAlive:
                     keepWorking = self._closeConnection(fromSocket)
                     if not keepWorking:
