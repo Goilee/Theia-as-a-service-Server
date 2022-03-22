@@ -39,7 +39,7 @@ class SingleUserProxy:
         message = fromSocket.recv(1024)
         self._dataToSend[toSocket].put(message)
         
-        print(f'Message recieved from {self._addresses[fromSocket]}: {message}')
+        print(f'Message recieved from {self._addresses[fromSocket]}: {len(message)}')
         if not message:
             return False
         else:
@@ -51,7 +51,7 @@ class SingleUserProxy:
         
         try:
             message = self._dataToSend[toSocket].get(block=False)
-            print(f'Message sent to {self._addresses[toSocket]}: {message}')
+            print(f'Message sent to {self._addresses[toSocket]}: {len(message)}')
             if not message:
                 return self._closeConnection(toSocket)
             else:
