@@ -1,10 +1,35 @@
 from argparse import ArgumentParser
-import socket
 import subprocess
-from SingleUserProxy import SingleUserProxy
+from http.server import HTTPServer, BaseHTTPRequestHandler
 import time
 
-parser = ArgumentParser(description='Echo server.')
+# запускает команду в shell и возвращает вывод
+def run_cmd(cmd):
+    process = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True)
+    return process.communicate()[0].decode('utf-8')
+
+# запускает контейнер RIDE на случайном порту и возвращает кортеж из ID и выделенного порта
+def run_RIDE():
+    container = run_cmd('docker run -dp 3000 ride')[:-1]
+    port = run_cmd("docker inspect -f '{{ (index (index .NetworkSettings.Ports \"3000/tcp\") 0).HostPort }}' " + container)
+    print(f'Started RIDE container (id={container}) on port {port}')
+    return (container, port)
+
+# возвращает, готов ли контейнер принимает соединения
+def is_RIDE_ready(container):
+    result = run_cmd(f'docker logs {container} | grep "Theia app listening"')
+    return 'Error' not in result and len(result) > 0
+
+class Redirect(BaseHTTPRequestHandler):
+    def do_GET(self):
+        (container, port) = run_RIDE()
+        while not is_RIDE_ready(container):
+            time.sleep(0.5)
+        self.send_response(302)
+        self.send_header('Location', f'http://{HOST}:{port}/')
+        self.end_headers()
+
+parser = ArgumentParser(description='RIDE server.')
 parser.add_argument('-a', '--address', help='host ip address', default='localhost')
 parser.add_argument('-p', '--port', help='port to listen', default='3000')
 
@@ -12,32 +37,10 @@ args = parser.parse_args()
 HOST = args.address
 PORT = int(args.port)
 
-hostSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-hostSocket.bind((HOST, PORT))
-hostSocket.listen(1)
-print(f'Listening to {HOST}:{PORT}');
-
+server = HTTPServer((HOST, PORT), Redirect)
+print(f'Listening on {HOST}:{PORT}...')
 try:
-    while True:
-        clientSocket, addr = hostSocket.accept()
-        print(f'New client: {addr}')
-        
-        process = subprocess.Popen(['sh', 'runProcess.sh'], stdout=subprocess.PIPE)
-        stdout = process.communicate()[0].decode('utf-8').splitlines()
-        processAddr = ('localhost', int(stdout[0]))
-        processId = stdout[1]
-        print(f'Started process (id={processId}) on {processAddr}')
-        
-        time.sleep(5)
-        
-        serverSocket = socket.socket()
-        serverSocket.connect(processAddr)
-        proxy = SingleUserProxy((clientSocket, addr), (serverSocket, processAddr))
-        print(f'Connected {addr} with {processAddr}')
-        
-        proxy.serveForever()
-        
-        subprocess.Popen(['sh', 'stopProcess.sh', processId], stdout=subprocess.PIPE)
-        print(f'Stopped process (id={processId}) on {processAddr}')
+    server.serve_forever()
 except KeyboardInterrupt:
-    pass
+    print("Stopping the server...")
+    server.server_close()
