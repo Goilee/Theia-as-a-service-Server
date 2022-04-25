@@ -6,7 +6,7 @@ from threading import Thread
 from os import _exit
 
 
-parser = ArgumentParser(description='RIDE server.')
+parser = ArgumentParser(description='Docker application server.')
 parser.add_argument('-a', '--address', dest='HOST', help='host ip address', default='localhost')
 parser.add_argument('-p', '--port', dest='PORT', help='port to listen', type=int, default=3000)
 parser.add_argument('-d', '--debug', dest='DEBUG', help='run in debug mode', action='store_const', const=True, default=False)
@@ -19,19 +19,19 @@ def run_cmd(cmd):
     return process.communicate()[0].decode('utf-8')
 
 
-# запускает контейнер RIDE на случайном порту и возвращает кортеж (ip, port)
-def run_container():    
+# запускает контейнер на случайном порту и возвращает кортеж (ip, port)
+def run_container():
     host = args.HOST
-    container = run_cmd(f'docker run --ip={host} --detach --publish 3000 ride')[:-1]
-    port = int(run_cmd("docker inspect -f '{{ (index (index .NetworkSettings.Ports \"3000/tcp\") 0).HostPort }}' " + container))
-    print(f'Started RIDE container (id={container}) on ({host},{port})')
+    result = run_cmd(f'sh runContainer.sh {host}').splitlines()
+    port = result[0]
+    container = result[1]
+    print(f'Started container (id={container}) on ({host},{port})')
     return (host, port)
 
 
 # удаляет контейнер и возвращает вывод команды
-def force_remove_container(id):
-    cmd = f'docker rm -f {id}'
-    result = run_cmd(f'docker rm -f {id}')[:-1]
+def force_remove_container(container):
+    result = run_cmd(f'sh removeContainer.sh {container}')[:-1]
     print(f'Force removed: {result}')
     return result
 
@@ -48,7 +48,9 @@ def find_last_line_in_logs(container, substr):
 
 # возвращает список айднишников запущенных контейнеров
 def get_running_containers():
-    result = run_cmd('docker ps -q --filter "ancestor=ride"')
+    with open('image') as f:
+        image = f.read()
+    result = run_cmd(f'docker ps -q --filter "ancestor={image}"')
     return result.splitlines()
 
 
@@ -81,6 +83,7 @@ try:
     app.register_blueprint(main)
     app.run(host = args.HOST, port = args.PORT, debug = args.DEBUG)
 finally:
+    print('Clean all containers...')
     clean_containers(True)
     _exit(0)
 
