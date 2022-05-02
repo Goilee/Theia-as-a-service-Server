@@ -18,13 +18,14 @@ from flask_login import login_user, logout_user, login_required
 from .models import Users, Containers
 from . import db
 
+from project.config import CLIENT_SECRET_FILE
+
 auth = Blueprint('auth', __name__)
 
 GOOGLE_CLIENT_ID = "965585679534-5bda3akurikq2ocsbpuhdp054fsk78a3.apps.googleusercontent.com"
-client_secrets_file = os.path.join(pathlib.Path(__file__).parent, "client_secret.json")
 
 flow = Flow.from_client_secrets_file(
-    client_secrets_file=client_secrets_file,
+    client_secrets_file=CLIENT_SECRET_FILE,
     scopes=["https://www.googleapis.com/auth/userinfo.profile", "https://www.googleapis.com/auth/userinfo.email",
             "openid"],
     redirect_uri="http://127.0.0.1:5000/callback"

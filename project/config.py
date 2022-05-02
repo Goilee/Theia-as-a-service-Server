@@ -23,13 +23,14 @@ CONFIG_FILE = 'config.ini'
 config = ConfigParser()
 config.read(CONFIG_FILE)
 
-HOST = config['NETWORK']['Host']
-PORT = int(config['NETWORK']['Port'])
+HOST = config['NETWORK']['host']
+PORT = int(config['NETWORK']['port'])
 
-DOCKER_IMAGE = config['DOCKER']['Image']
-DOCKER_EXPOSED_PORT = int(config['DOCKER']['Exposed_port'])
-DOCKER_NEW_CLIENT_OUTPUT_SUBSTR = config['DOCKER']['New_client_output_substr']
-DOCKER_CLIENT_EXITED_OUTPUT_SUBSTR = config['DOCKER']['Client_exited_output_substr']
+DOCKER_IMAGE = config['DOCKER']['image']
+DOCKER_EXPOSED_PORT = int(config['DOCKER']['exposed_port'])
+DOCKER_NEW_CLIENT_OUTPUT_SUBSTR = config['DOCKER']['cew_client_output_substr']
+DOCKER_CLIENT_EXITED_OUTPUT_SUBSTR = config['DOCKER']['client_exited_output_substr']
 
-CLEANER_TIME_INTERVAL_IN_SECONDS = int(config['CLEANER']['Time_interval_in_seconds'])
+CLEANER_TIME_INTERVAL_IN_SECONDS = int(config['CLEANER']['time_interval_in_seconds'])
 
+CLIENT_SECRET_FILE = config['SECURITY']['client_secret_file']
