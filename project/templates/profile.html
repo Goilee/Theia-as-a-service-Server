@@ -1,0 +1,53 @@
+<!-- templates/profile.html -->
+
+{% extends "base.html" %}
+
+{% block content %}
+<h1 class="title">
+    Welcome, {{ name }}!
+</h1>
+<h2 class="subtitle">
+    If you need help, visit the appropriate section!
+</h2>
+<form method="POST" action="/profile">
+
+    <table>
+        <tr>
+            <td><label>Check</label></td>
+            <td><label>Container Name</label></td>
+            <td><label>Container ID</label></td>
+        </tr>
+        {% for c in list %}
+
+        <tr>
+            <td><input type="checkbox" value="{{c.id}}" name="chkbox"></td>
+            <td><input class="input is-small" type="text" name="cont_name{{c.id}}" value="{{c.container_name}}" autofocus=""></td>
+            <td><label>{{c.id}}</label></td>
+        </tr>
+
+        {% endfor %}
+    </table>
+    <div class="column is-5 is-offset-4">
+        <div class="buttons">
+            <input type="submit" class="button is-info" name="rename_btn" value="Rename">
+            <input type="submit" class="button is-success" name="create_btn" value="Create">
+            <input type="submit" class="button is-link" name="share_btn" value="Share">
+            <input type="submit" class="button is-danger" name="delete_btn" value="Delete">
+            <input type="submit" class="button is-warning" name="run_btn" value="Run">
+        </div>
+    </div>
+
+</form>
+
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+<div class="notification is-danger">
+    {{ messages[0] }}
+</div>
+<div class="notification is-link">
+    {{ messages[1] }}
+</div>
+{% endif %}
+{% endwith %}
+
+{% endblock %}
