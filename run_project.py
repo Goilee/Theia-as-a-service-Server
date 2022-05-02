@@ -24,6 +24,8 @@ cleaner_thread.start()
 with app.app_context():
     try:
         app.run(host=config['NETWORK']['Host'], port=config['NETWORK']['Port'], debug=args.debug)
+    except Exception as e:
+        print(e)
     finally:
         clean_containers(True)
         _exit(0)
