@@ -28,7 +28,7 @@ PORT = int(config['NETWORK']['port'])
 
 DOCKER_IMAGE = config['DOCKER']['image']
 DOCKER_EXPOSED_PORT = int(config['DOCKER']['exposed_port'])
-DOCKER_NEW_CLIENT_OUTPUT_SUBSTR = config['DOCKER']['cew_client_output_substr']
+DOCKER_NEW_CLIENT_OUTPUT_SUBSTR = config['DOCKER']['new_client_output_substr']
 DOCKER_CLIENT_EXITED_OUTPUT_SUBSTR = config['DOCKER']['client_exited_output_substr']
 
 CLEANER_TIME_INTERVAL_IN_SECONDS = int(config['CLEANER']['time_interval_in_seconds'])
