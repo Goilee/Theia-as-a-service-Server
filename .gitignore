@@ -1,3 +1,4 @@
 __pycache__/
 /project/db.sqlite
 /project/client_secret.json
+secret_key
