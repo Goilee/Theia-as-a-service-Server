@@ -25,7 +25,7 @@ cleaner_thread.start()
 
 with app.app_context():
     try:
-        app.run(host='127.0.0.1', port='5000', debug=True)
+        app.run(host='127.0.0.1', port='2000', debug=True)
     finally:
         clean_containers(True)
         os._exit(0)
