@@ -18,7 +18,7 @@ from flask_login import login_user, logout_user, login_required
 from .models import Users, Containers
 from . import db
 
-from project.config import CLIENT_SECRET_FILE
+from project.config import CLIENT_SECRET_FILE, HOST, PORT
 
 auth = Blueprint('auth', __name__)
 
@@ -28,7 +28,7 @@ flow = Flow.from_client_secrets_file(
     client_secrets_file=CLIENT_SECRET_FILE,
     scopes=["https://www.googleapis.com/auth/userinfo.profile", "https://www.googleapis.com/auth/userinfo.email",
             "openid"],
-    redirect_uri="http://127.0.0.1:5000/callback"
+    redirect_uri=f'http://{HOST}:{PORT}/callback'
 )
 
 
