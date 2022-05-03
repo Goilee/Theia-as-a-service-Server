@@ -30,6 +30,7 @@ DOCKER_IMAGE = config['DOCKER']['image']
 DOCKER_EXPOSED_PORT = int(config['DOCKER']['exposed_port'])
 DOCKER_NEW_CLIENT_OUTPUT_SUBSTR = config['DOCKER']['new_client_output_substr']
 DOCKER_CLIENT_EXITED_OUTPUT_SUBSTR = config['DOCKER']['client_exited_output_substr']
+DOCKER_WAIT_TIME_IN_SECONDS = config['DOCKER']['wait_time_in_seconds']
 
 CLEANER_TIME_INTERVAL_IN_SECONDS = int(config['CLEANER']['time_interval_in_seconds'])
 

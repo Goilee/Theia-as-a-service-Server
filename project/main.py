@@ -6,6 +6,7 @@ from flask import redirect, url_for, Blueprint, render_template, request, sessio
 from flask_login import current_user, login_required
 from . import db
 from .models import Users, Containers
+from .config import DOCKER_WAIT_TIME_IN_SECONDS
 
 main = Blueprint('main', __name__)
 
@@ -54,7 +55,7 @@ def profile():
             for id in data:
                 start_container(id)
                 URL = get_URL(id)
-                return render_template('loader.html'), {"Refresh": f"3; url={URL}"}
+                return render_template('loader.html'), {"Refresh": f"{DOCKER_WAIT_TIME_IN_SECONDS}; url={URL}"}
 
     info = []
     try:
