@@ -2,7 +2,7 @@ from subprocess import Popen, PIPE
 from .models import Container
 
 from . import db
-from project.config import HOST
+from project.config import HOST, DOCKER_IMAGE, DOCKER_NEW_CLIENT_OUTPUT_SUBSTR, DOCKER_CLIENT_EXITED_OUTPUT_SUBSTR
 
 
 # запускает команду в shell и возвращает вывод
@@ -56,15 +56,15 @@ def find_last_line_in_logs(container, substr):
 
 # возвращает список айднишников запущенных контейнеров
 def get_running_containers():
-    result = run_cmd('docker ps -q --filter "ancestor=ride"')
+    result = run_cmd(f'docker ps -q --filter "ancestor={DOCKER_IMAGE}"')
     return result.splitlines()
 
 
 # удаляет запущенные контейнеры, из которых вышел юзер (или все, если параметр True)
 def clean_containers(cleanAll=False):
     for container in get_running_containers():
-        clientEnter = find_last_line_in_logs(container, "Set client")
-        clientExit = find_last_line_in_logs(container, "All contributions have been stopped")
+        clientEnter = find_last_line_in_logs(container, DOCKER_NEW_CLIENT_OUTPUT_SUBSTR)
+        clientExit = find_last_line_in_logs(container, DOCKER_CLIENT_EXITED_OUTPUT_SUBSTR)
         print(f'Container {container}: entered {clientEnter}, exited {clientExit}')
         if clientExit > clientEnter:
             # force_remove_container(container)
