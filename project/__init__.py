@@ -8,7 +8,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from logging import INFO
 
-from project.config import SECRET_KEY
+from .config import SECRET_KEY
 
 
 # init SQLAlchemy so we can use it later in our models

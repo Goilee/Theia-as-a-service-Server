@@ -5,7 +5,7 @@ from os import _exit
 
 from project.config import CONFIG_FILE, CLEANER_TIME_INTERVAL_IN_SECONDS, HOST, PORT
 from project import app
-from project.docker_manager import *
+from project.docker_manager import stop_containers
 
 SETTINGS_FILE = 'config.ini'
 

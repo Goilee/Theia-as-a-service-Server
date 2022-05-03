@@ -1,9 +1,9 @@
 # main.py
-import datetime
 
-from .docker_manager import create_container, force_remove_container, get_URL, stop_container, start_container
-from flask import redirect, url_for, Blueprint, render_template, request, session, abort, current_app, flash
+from flask import Blueprint, render_template, request, session, current_app, flash
 from flask_login import current_user, login_required
+
+from .docker_manager import create_container, force_remove_container, get_URL, start_container
 from . import db
 from .models import Users, Containers
 from .config import DOCKER_WAIT_TIME_IN_SECONDS

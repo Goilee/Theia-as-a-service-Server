@@ -1,12 +1,9 @@
 # auth.py
 
-import os.path
-import pathlib
-
-import cachecontrol
+from cachecontrol import CacheControl
 import requests
 
-from flask import Flask, session, abort, redirect, request, Response, stream_with_context
+from flask import session, abort, redirect, request, Blueprint, render_template, redirect, url_for, flash, current_app
 
 from google_auth_oauthlib.flow import Flow
 from google.oauth2 import id_token
@@ -14,13 +11,13 @@ import google.auth.transport.requests
 
 from json import loads
 
-from flask import Blueprint, render_template, redirect, url_for, request, flash, current_app
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import login_user, logout_user, login_required
+
 from .models import Users
 from . import db
+from .config import CLIENT_SECRET_FILE, HOST, PORT
 
-from project.config import CLIENT_SECRET_FILE, HOST, PORT
 
 auth = Blueprint('auth', __name__)
 
@@ -119,7 +116,7 @@ def callback():
 
     credentials = flow.credentials
     request_session = requests.session()
-    cached_session = cachecontrol.CacheControl(request_session)
+    cached_session = CacheControl(request_session)
     token_request = google.auth.transport.requests.Request(session=cached_session)
 
     id_info = id_token.verify_oauth2_token(
