@@ -1,8 +1,8 @@
 # main.py
 import datetime
 
-from .docker_manager import run_container, force_remove_container, get_URL, stop_container, start_container
-from flask import Blueprint, render_template, request, session, abort, current_app, flash
+from .docker_manager import create_container, force_remove_container, get_URL, stop_container, start_container
+from flask import redirect, url_for, Blueprint, render_template, request, session, abort, current_app, flash
 from flask_login import current_user, login_required
 from . import db
 from .models import Users, Containers
@@ -42,7 +42,7 @@ def profile():
 
         elif 'create_btn' in request.form:
             print(request.form['create_btn'])
-            (host, port, container, name) = run_container()
+            (container, name) = create_container()
             print(current_user.id)
             print(container)
             new_container = Containers(id=container, user_id=current_user.id, container_name=name)
@@ -52,7 +52,7 @@ def profile():
             db.session.add(new_container)
             db.session.commit()
 
-            return render_template('loader.html'), {"Refresh": f"3; url=http://{host}:{port}"}
+            return redirect(url_for('main.profile'))
 
         elif 'delete_btn' in request.form:
             print(request.form['delete_btn'])

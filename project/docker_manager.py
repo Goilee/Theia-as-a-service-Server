@@ -11,19 +11,19 @@ def run_cmd(cmd):
     return process.communicate()[0].decode('utf-8')
 
 
+# запускает контейнер на случайном порту
 def start_container(id):
     result = run_cmd(f'docker start {id}')[:-1]
     print(f'Started: {result}')
     return result
 
 
-# запускает контейнер RIDE на случайном порту и возвращает кортеж (ip, port, id, name)
-def run_container():
-    container = run_cmd(f'docker run --ip={HOST} --detach --publish 3000 ride')[:12]
-    port = get_container_port(container)
-    name = run_cmd('docker ps --filter "id=' + container + '" --format "{{.Names}}"')
-    print(f'Started container {name} (id={container}) on ({HOST},{port})')
-    return HOST, port, container, name
+# создаёт контейнер RIDE и возвращает кортеж (id, name)
+def create_container():
+    container = run_cmd(f'docker create --ip={HOST} --publish 3000 ride')[:12]
+    name = run_cmd('docker ps -a --filter "id=' + container + '" --format "{{.Names}}"')
+    print(f'Created container {name} (id={container})')
+    return container, name
 
 
 # останавливает контейнер и возвращает вывод команды
