@@ -42,34 +42,32 @@ def force_remove_container(id):
     return result
 
 
-# возвращает номер последней строки, содержащей подстроку line (-1 при отсутствии)
-def find_last_line_in_logs(container, substr):
-    result = run_cmd(f'''docker logs {container} 2>&1 | grep -n "{substr}" | tail --lines=1''')
+# возвращает число строк в логах контейнера, содержащих подстроку substr
+# если вдруг утилита wc вернёт не число, выбросится исключение с выводом wc
+def number_of_log_lines(container, substr):
+    result = run_cmd(f'''docker logs {container} 2>&1 | grep -n "{substr}" | wc -l''')
     try:
-        lineNumber = int(result[0:result.index(':')])
-        return lineNumber
+        return int(result)
     except ValueError:
-        return -1
+    	raise Exception(f'"wc -l" returned: {result}')
 
 
-# возвращает список айднишников запущенных контейнеров
-def get_running_containers():
-    result = run_cmd(f'docker ps -q --filter "ancestor={DOCKER_IMAGE}"')
-    return result.splitlines()
+# возвращает список айднишников контейнеров
+def get_containers():
+    return run_cmd(f'docker ps -q --filter "ancestor={DOCKER_IMAGE}"').splitlines()
 
 
-# удаляет запущенные контейнеры, из которых вышел юзер (или все, если параметр True)
-def clean_containers(cleanAll=False):
-    for container in get_running_containers():
-        clientEnter = find_last_line_in_logs(container, DOCKER_NEW_CLIENT_OUTPUT_SUBSTR)
-        clientExit = find_last_line_in_logs(container, DOCKER_CLIENT_EXITED_OUTPUT_SUBSTR)
-        print(f'Container {container}: entered {clientEnter}, exited {clientExit}')
-        if clientExit > clientEnter:
-            # force_remove_container(container)
+# останавливает запущенные контейнеры, из которых вышел юзер (или все, если параметр True)
+def stop_containers(stop_all = False):
+    for container in get_containers():
+        to_stop = stop_all
+        if not to_stop:
+            clients_entered = number_of_log_lines(container, DOCKER_NEW_CLIENT_OUTPUT_SUBSTR)
+            clients_exited = number_of_log_lines(container, DOCKER_CLIENT_EXITED_OUTPUT_SUBSTR)
+            print(f'Container {container}: entered {clients_entered}, exited {clients_exited}')
+            to_stop = clients_exited >= clients_entered
+        if to_stop:
             stop_container(container)
-        if cleanAll:
-            # TODO: сделать фильтр на остановленные контейнеры тоже!
-            force_remove_container(container)
 
 
 # возвращает назначенный контейнеру порт (None, если такой контейнер не запущен)

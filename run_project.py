@@ -14,7 +14,7 @@ parser.add_argument('-d', '--debug', help='run in debug mode', action='store_con
 args = parser.parse_args()
 
 scheduler = BlockingScheduler()
-scheduler.add_job(clean_containers, 'interval', seconds=CLEANER_TIME_INTERVAL_IN_SECONDS)
+scheduler.add_job(stop_containers, 'interval', seconds=CLEANER_TIME_INTERVAL_IN_SECONDS)
 cleaner_thread = Thread(target=scheduler.start, args=())
 cleaner_thread.start()
 
@@ -24,6 +24,6 @@ with app.app_context():
     except Exception as e:
         print(e)
     finally:
-        clean_containers(True)
+        stop_containers(stop_all = True)
         _exit(0)
 
