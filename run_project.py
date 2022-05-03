@@ -27,5 +27,5 @@ with app.app_context():
         app.logger.critical(e)
     finally:
         stop_containers(stop_all = True)
-        _exit(0)
+        _exit(0)  # не уверен, но возможно только так сразу завершился поток cleaner_thread
 
