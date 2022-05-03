@@ -29,7 +29,7 @@ def create_app():
 
     os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
 
-    from .models import Users, Containers
+    from .models import Users
 
     @login_manager.user_loader
     def load_user(user_id):
