@@ -24,54 +24,34 @@ def help():
 @login_required
 def profile():
     if request.method == 'POST':
-        print("post")
         data = request.form.getlist('chkbox')
 
         if 'rename_btn' in request.form:
-            print(request.form['rename_btn'])
             rnm = Users.query.filter_by(email=session.get("email")).first().cont
             for c in rnm:
                 cont_name = request.form.get(f'cont_name{c.id}')
-                print(c.id, cont_name)
+                
                 container = Containers.query.filter_by(id=c.id).first()
-                print(container)
-
-                print(cont_name)
+                old_name = container.container_name
                 container.container_name = cont_name
                 db.session.commit()
+                current_app.logger.info(f'Renamed container id={container.id}: old name "{old_name}", new name "{container.container_name}"')
 
         elif 'create_btn' in request.form:
-            print(request.form['create_btn'])
-            (container, name) = create_container()
-            print(current_user.id)
-            print(container)
-            new_container = Containers(id=container, user_id=current_user.id, container_name=name)
-            print(name)
-
-            # add the new container to the database
-            db.session.add(new_container)
-            db.session.commit()
-
-            return redirect(url_for('main.profile'))
+            create_container()
 
         elif 'delete_btn' in request.form:
-            print(request.form['delete_btn'])
             for id in data:
-                print(id)
                 force_remove_container(id)
 
         elif 'share_btn' in request.form:
-            print(request.form['share_btn'])
             for id in data:
-                print(id)
                 URL = get_URL(id)
                 flash('Be careful! Everyone will be able to connect to the container using your link!')
                 flash(f'Your link: {URL}')
 
         elif 'run_btn' in request.form:
-            print(request.form['run_btn'])
             for id in data:
-                print(id)
                 start_container(id)
                 URL = get_URL(id)
                 return render_template('loader.html'), {"Refresh": f"3; url={URL}"}
@@ -79,8 +59,8 @@ def profile():
     info = []
     try:
         info = Users.query.filter_by(email=session.get("email")).first().cont
-    except:
-        print("Error")
+    except Exception as e:
+        current_app.logger.error(e)
 
     username = current_user.name
     return render_template('profile.html', name=username, list=info)

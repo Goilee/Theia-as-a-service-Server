@@ -21,8 +21,10 @@ cleaner_thread.start()
 with app.app_context():
     try:
         app.run(host=HOST, port=PORT, debug=args.debug)
+    except KeyboardInterrupt:
+        pass
     except Exception as e:
-        print(e)
+        app.logger.critical(e)
     finally:
         stop_containers(stop_all = True)
         _exit(0)

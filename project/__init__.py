@@ -5,6 +5,7 @@ from os import environ
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
+from logging import DEBUG
 
 from project.config import SECRET_KEY
 
@@ -15,6 +16,8 @@ db = SQLAlchemy()
 
 def create_app():
     app = Flask(__name__)
+    
+    app.logger.setLevel(DEBUG)
     
     app.config['SECRET_KEY'] = SECRET_KEY
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db.sqlite'

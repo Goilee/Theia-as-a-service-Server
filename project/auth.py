@@ -14,7 +14,7 @@ import google.auth.transport.requests
 
 from json import loads
 
-from flask import Blueprint, render_template, redirect, url_for, request, flash
+from flask import Blueprint, render_template, redirect, url_for, request, flash, current_app
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import login_user, logout_user, login_required
 from .models import Users
@@ -47,16 +47,17 @@ def login_post():
     remember = True if request.form.get('remember') else False
 
     user = Users.query.filter_by(email=email).first()
-
     # check if user actually exists
     # take the user supplied password, hash it, and compare it to the hashed password in database
     if not user or not check_password_hash(user.password, password):
         flash('Please check your login details and try again.')
+        current_app.logger.info(f'Logging failed for user {email}')
         return redirect(url_for('auth.login'))  # if user doesn't exist or password is wrong, reload the page
 
     # if the above check passes, then we know the user has the right credentials
     login_user(user, remember=remember)
     session["email"] = email
+    current_app.logger.info(f'Logging succeeded for user {email}')
     return redirect(url_for('main.profile'))
 
 
@@ -76,6 +77,7 @@ def signup_post():
 
     if user:  # if a user is found, we want to redirect back to signup page so user can try again
         flash('Email address already exists')
+        current_app.logger.info(f'Signup failed for user {email}')
         return redirect(url_for('auth.signup'))
 
     # create new user with the form data. Hash the password so plaintext version isn't saved.
@@ -85,12 +87,14 @@ def signup_post():
     db.session.add(new_user)
     db.session.commit()
 
+    current_app.logger.info(f'Signup succeeded for user {email}')
     return redirect(url_for('auth.login'))
 
 
 @auth.route('/logout')
 @login_required
 def logout():
+    current_app.logger.info(f'Logout: {session.get("email")}')
     logout_user()
     return redirect(url_for('main.index'))
 
@@ -110,7 +114,8 @@ def callback():
     flow.fetch_token(authorization_response=request.url)
 
     if not session["state"] == request.args["state"]:
-        abort(500)  # State does not match!
+        current_app.logger.warning(f'State does not match: state {session["state"]}, request {request.args["state"]}')
+        abort(500)
 
     credentials = flow.credentials
     request_session = requests.session()
@@ -127,14 +132,11 @@ def callback():
     session["email"] = id_info.get("email")
     session["name"] = id_info.get("name")
 
-    print(f'{session.get("google_id")}')
-    print(f'{session.get("email")} зашел')
-    print(f'{session.get("name")} зашел')
-
     user = Users.query.filter_by(email=session.get("email")).first()
 
     if user:
         login_user(user)
+        current_app.logger.info(f'Google login succeeded for user {session.get("email")}')
         return redirect(url_for('main.profile'))
 
     # create new user with the form data. Hash the password so plaintext version isn't saved.
@@ -143,6 +145,9 @@ def callback():
     # add the new user to the database
     db.session.add(new_user)
     db.session.commit()
+    current_app.logger.info(f'Signup via google login: new user {session.get("email")}')
+    
     user = Users.query.filter_by(email=session.get("email")).first()
     login_user(user)
+    current_app.logger.info(f'Google login succeeded for user {session.get("email")}')
     return redirect(url_for('main.profile'))
