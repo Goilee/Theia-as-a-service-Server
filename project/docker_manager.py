@@ -1,5 +1,5 @@
 from subprocess import Popen, PIPE
-from .models import Container
+from .models import Containers
 
 from . import db
 from project.config import HOST, DOCKER_IMAGE, DOCKER_NEW_CLIENT_OUTPUT_SUBSTR, DOCKER_CLIENT_EXITED_OUTPUT_SUBSTR
@@ -25,7 +25,7 @@ def run_container():
     container = container[:12]
     name = run_cmd('docker ps --filter "id=' + container + '" --format "{{.Names}}"')
     print(f'Started container {name} (id={container}) on ({HOST},{port})')
-    return host, port, container, name
+    return HOST, port, container, name
 
 
 # останавливает контейнер и возвращает вывод команды
