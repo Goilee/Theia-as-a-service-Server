@@ -12,6 +12,8 @@ from google_auth_oauthlib.flow import Flow
 from google.oauth2 import id_token
 import google.auth.transport.requests
 
+from json import loads
+
 from flask import Blueprint, render_template, redirect, url_for, request, flash
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import login_user, logout_user, login_required
@@ -22,7 +24,8 @@ from project.config import CLIENT_SECRET_FILE, HOST, PORT
 
 auth = Blueprint('auth', __name__)
 
-GOOGLE_CLIENT_ID = "965585679534-5bda3akurikq2ocsbpuhdp054fsk78a3.apps.googleusercontent.com"
+with open (CLIENT_SECRET_FILE, 'r') as f:
+    GOOGLE_CLIENT_ID = loads(f.read())['web']['client_id']
 
 flow = Flow.from_client_secrets_file(
     client_secrets_file=CLIENT_SECRET_FILE,
