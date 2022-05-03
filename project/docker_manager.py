@@ -2,7 +2,7 @@ from subprocess import Popen, PIPE
 from .models import Containers
 
 from . import db
-from project.config import HOST, DOCKER_IMAGE, DOCKER_NEW_CLIENT_OUTPUT_SUBSTR, DOCKER_CLIENT_EXITED_OUTPUT_SUBSTR
+from project.config import HOST, DOCKER_IMAGE, DOCKER_NEW_CLIENT_OUTPUT_SUBSTR, DOCKER_CLIENT_EXITED_OUTPUT_SUBSTR, DOCKER_EXPOSED_PORT
 
 
 # запускает команду в shell и возвращает вывод
@@ -19,10 +19,8 @@ def start_container(id):
 
 # запускает контейнер RIDE на случайном порту и возвращает кортеж (ip, port, id, name)
 def run_container():
-    container = run_cmd(f'docker run --ip={HOST} --detach --publish 3000 ride')[:-1]
-    port = int(run_cmd(
-        "docker inspect -f '{{ (index (index .NetworkSettings.Ports \"3000/tcp\") 0).HostPort }}' " + container))
-    container = container[:12]
+    container = run_cmd(f'docker run --ip={HOST} --detach --publish 3000 ride')[:12]
+    port = get_container_port(container)
     name = run_cmd('docker ps --filter "id=' + container + '" --format "{{.Names}}"')
     print(f'Started container {name} (id={container}) on ({HOST},{port})')
     return HOST, port, container, name
@@ -74,16 +72,18 @@ def clean_containers(cleanAll=False):
             force_remove_container(container)
 
 
-# фильтр на запущенные порты
-def get_running_ports(id):
-    result = run_cmd(f'docker port {id[:12]} 3000')
-    print(result.splitlines()[1][3:])
-    return result.splitlines()[1][3:]
+# возвращает назначенный контейнеру порт (None, если такой контейнер не запущен)
+def get_container_port(id):
+    result = run_cmd(f'docker port {id[:12]} {DOCKER_EXPOSED_PORT}')
+    try:
+        return int(result.splitlines()[0][8:])
+    except ValueError:
+        return None
 
 
 def get_URL(id):
-    port = get_running_ports(id)
-    URL = f'http://127.0.0.1:{port}/#/RIDE-workspaces'
+    port = get_container_port(id)
+    URL = f'http://{HOST}:{port}'
     print(URL)
     return URL
 
