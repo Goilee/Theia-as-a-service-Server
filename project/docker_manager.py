@@ -1,6 +1,8 @@
 from subprocess import Popen, PIPE
-from .models import Containers
+from .models import Container
+
 from . import db
+from project.config import HOST
 
 
 # запускает команду в shell и возвращает вывод
@@ -15,16 +17,14 @@ def start_container(id):
     return result
 
 
-# запускает контейнер RIDE на случайном порту и возвращает кортеж (ip, port)
+# запускает контейнер RIDE на случайном порту и возвращает кортеж (ip, port, id, name)
 def run_container():
-    host = '127.0.0.1'
-    container = run_cmd(f'docker run --ip={host} --detach --publish 3000 ride')[:-1]
+    container = run_cmd(f'docker run --ip={HOST} --detach --publish 3000 ride')[:-1]
     port = int(run_cmd(
         "docker inspect -f '{{ (index (index .NetworkSettings.Ports \"3000/tcp\") 0).HostPort }}' " + container))
-    print(f'Started RIDE container (id={container}) on ({host},{port})')
     container = container[:12]
     name = run_cmd('docker ps --filter "id=' + container + '" --format "{{.Names}}"')
-    print(container, name)
+    print(f'Started container {name} (id={container}) on ({HOST},{port})')
     return host, port, container, name
 
 
