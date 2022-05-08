@@ -33,7 +33,7 @@
 6. На экранах Scopes и Test users можно ничего не настраивать, сразу нажав на SAVE AND CONTINUE.
 7. Нажимаем BACK TO DASHBOARD. Возвращаемся на страницу Credentials и нажимаем CREATE CREDENTIALS -> OAuth Client ID.
 8. Указываем Application type = Web application.
-9. Добавляем в Authorized redirect URIs адрес "http://<host>/redirect", заменив <host> на адрес своего хоста.
+9. Добавляем в Authorized redirect URIs адрес "http://\<host\>/callback", заменив \<host\> на адрес своего хоста.
 10. Скачиваем сгенерированные данные в формате JSON. Добавляем в корневую директорию под названием, указанным в config.ini (по умолчанию client_secret.json).
 
 # Настройка параметров сервера
