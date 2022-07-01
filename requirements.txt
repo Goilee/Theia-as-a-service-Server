@@ -4,3 +4,4 @@ flask_sqlalchemy
 flask_login
 cachecontrol
 google_auth_oauthlib
+werkzeug==2.0.3
