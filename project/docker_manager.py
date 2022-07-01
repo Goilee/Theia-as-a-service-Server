@@ -22,7 +22,7 @@ def start_container(id):
 
 # создаёт контейнер RIDE и добавляет в БД, возвращает id
 def create_container():
-    id = run_cmd(f'docker create --ip={HOST} --publish 3000 ride')[:12]
+    id = run_cmd(f'docker create --ip={HOST} --publish 3000 {DOCKER_IMAGE}')[:12]
     name = run_cmd('docker ps -a --filter "id=' + id + '" --format "{{.Names}}"')[:-1]
     current_app.logger.info(f'Created container {name} ({id})')
     
