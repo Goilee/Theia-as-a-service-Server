@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="columns is-centered">
+    <div class="column is-6">
+        <div class="card">
+            <div class="card-content">
+                <h1 class="title is-4 has-text-centered">
+                    Manage Users for Container: {{ container.container_name }}
+                </h1>
+
+                <form method="POST">
+                    <div class="field">
+                        <label class="label">Select Users (only regular users can be added)</label>
+
+                        <div class="box" style="max-height: 300px; overflow-y: auto;">
+                            {% for user in users %}
+                                {% if user.role == 'User' %}
+                                <div class="field">
+                                    <div class="is-flex is-justify-content-space-between is-align-items-center mb-2">
+                                        <label class="checkbox">
+                                            <input type="checkbox" name="user_ids" value="{{ user.id }}"
+                                                   {% if user.id in container_user_roles %}checked{% endif %}>
+                                            {{ user.email }} ({{ user.name }})
+                                        </label>
+
+
+                                        <div class="select is-small ml-2">
+                                            <select name="role_{{ user.id }}">
+                                                {% set current_role = container_user_roles.get(user.id | int, 'Reader') %}
+                                                {% for role in ['Reader', 'Editor'] %}
+                                                    <option value="{{ role }}" {% if current_role == role %}selected{% endif %}>{{ role }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <div class="buttons is-centered">
+                            <button type="submit" class="button is-primary">
+                                <span class="icon">
+                                    <i class="fas fa-save"></i>
+                                </span>
+                                <span>Save Changes</span>
+                            </button>
+                            <a href="{{ url_for('admin.container_management') }}" class="button is-light">
+                                <span class="icon">
+                                    <i class="fas fa-arrow-left"></i>
+                                </span>
+                                <span>Back to Containers</span>
+                            </a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

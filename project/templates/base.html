@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>RIDE</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="shortcut icon" type="image/x-icon" href="{{ url_for('static', filename='images/ride_icon.ico') }}">
+
+    <style>
+        :root {
+            --primary-shadow: 0 4px 6px -1px rgba(0, 98, 204, 0.1), 0 2px 4px -1px rgba(0, 98, 204, 0.06);
+            --smooth-transition: all 0.3s ease;
+        }
+
+        .hero.is-primary {
+            background: linear-gradient(135deg, #05c4ba 0%, #028e86 100%);
+        }
+
+        .card {
+            border-radius: 10px;
+            box-shadow: var(--primary-shadow);
+            transition: var(--smooth-transition);
+        }
+
+        .table-container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: var(--primary-shadow);
+            padding: 1.5rem;
+            margin: 2rem auto;
+            overflow-x: auto;
+        }
+
+        .table {
+            width: 100%;
+        }
+
+        .table th {
+            background-color: #f5f5f5;
+            font-weight: 600;
+        }
+
+        .button {
+            transition: var(--smooth-transition);
+            font-weight: 500;
+        }
+
+        .notification {
+            border-radius: 8px;
+            margin: 1rem 0;
+        }
+
+        .img-center {
+            display: block;
+            margin: 0 auto 2rem;
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: var(--primary-shadow);
+        }
+
+        .form-container {
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .loader-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 60vh;
+        }
+
+        .table th, .table td {
+            padding: 0.5em 0.75em;
+        }
+
+        .table-container {
+            margin-top: 1rem;
+        }
+
+        .button.is-small {
+            height: 2em;
+            width: 2em;
+        }
+        .select.is-multiple select {
+            min-height: 150px;
+        }
+
+        .buttons.are-small .button {
+            height: 2em;
+            width: 2em;
+        }
+
+        .buttons.are-small .button .icon {
+            height: 1.5em;
+            width: 1.5em;
+        }
+
+        [title] {
+            cursor: help;
+        }
+    </style>
+</head>
+
+<body>
+    <section class="hero is-primary is-fullheight">
+        <!-- Навигация -->
+        <div class="hero-head">
+            <nav class="navbar is-transparent">
+                <div class="container">
+                    <div class="navbar-brand">
+                        <a class="navbar-item" href="{{ url_for('main.profile') if current_user.is_authenticated else url_for('auth.login') }}">
+                            <i class="fas fa-code mr-2"></i>
+                            <strong>RIDE</strong>
+                        </a>
+                    </div>
+
+                    <div id="navbarMenuHeroA" class="navbar-menu">
+                        <div class="navbar-end">
+                            {% if current_user.is_authenticated %}
+                            <a href="{{ url_for('auth.logout') }}" class="navbar-item">
+                                <i class="fas fa-sign-out-alt mr-2"></i> Logout
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </nav>
+        </div>
+
+        <!-- Основное содержимое -->
+        <div class="hero-body">
+            <div class="container">
+                {% block content %}{% endblock %}
+            </div>
+        </div>
+    </section>
+
+    <!-- Скрипты -->
+    <script>
+        // Автозакрытие уведомлений через 5 секунд
+        document.addEventListener('DOMContentLoaded', () => {
+            (document.querySelectorAll('.notification .delete') || []).forEach(($delete) => {
+                $notification = $delete.parentNode;
+                $delete.addEventListener('click', () => {
+                    $notification.parentNode.removeChild($notification);
+                });
+
+                setTimeout(() => {
+                    if ($notification.parentNode) {
+                        $notification.parentNode.removeChild($notification);
+                    }
+                }, 5000);
+            });
+        });
+    </script>
+</body>
+</html>

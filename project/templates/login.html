@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="columns is-centered">
+    <div class="column is-5">
+        <div class="card">
+            <div class="card-content">
+                <div class="has-text-centered mb-5">
+                    <img class="img-center" src="{{ url_for('static', filename='images/ride.jpg') }}" alt="RIDE Logo" style="max-width: 200px;">
+                    <h1 class="title is-3 has-text-primary">RIDE</h1>
+                    <h2 class="subtitle is-5">IDE for Reflex. Theia-based. Docker-based.</h2>
+                </div>
+
+                {% with messages = get_flashed_messages() %}
+                    {% if messages %}
+                        <div class="notification is-danger is-light">
+                            <button class="delete"></button>
+                            {{ messages[0] }}
+                        </div>
+                    {% endif %}
+                {% endwith %}
+
+                <form method="POST" action="{{ url_for('auth.login') }}">
+                    <div class="field">
+                        <label class="label">Email</label>
+                        <div class="control has-icons-left">
+                            <input class="input" type="email" name="email" placeholder="your@email.com" required autofocus>
+                            <span class="icon is-small is-left">
+                                <i class="fas fa-envelope"></i>
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <label class="label">Password</label>
+                        <div class="control has-icons-left">
+                            <input class="input" type="password" name="password" placeholder="Your password" required>
+                            <span class="icon is-small is-left">
+                                <i class="fas fa-lock"></i>
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <label class="checkbox">
+                            <input type="checkbox" name="remember">
+                            Remember me
+                        </label>
+                    </div>
+
+                    <div class="field">
+                        <button class="button is-primary is-fullwidth is-medium">
+                            <span class="icon">
+                                <i class="fas fa-sign-in-alt"></i>
+                            </span>
+                            <span>Login</span>
+                        </button>
+                    </div>
+                </form>
+                <div class="field">
+                    <a href="{{ url_for('main.guest_access') }}" class="button is-light is-fullwidth is-medium">
+                        <span class="icon">
+                            <i class="fas fa-user-clock"></i>
+                        </span>
+                        <span>Login as Guest</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

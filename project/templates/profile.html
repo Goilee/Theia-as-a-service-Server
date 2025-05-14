@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="columns is-centered">
+        <div class="column is-10">
+            <div class="card">
+                <div class="card-content">
+                    <div class="notification is-primary is-light">
+                        Welcome, {{ name }}!
+                    </div>
+                    {% with messages = get_flashed_messages() %}
+                        {% if messages %}
+                            <div class="notification is-danger is-light">
+                                <button class="delete"></button>
+                                {{ messages[0] }}
+                            </div>
+                            {% if messages|length > 1 %}
+                            <div class="notification is-link is-light">
+                                <button class="delete"></button>
+                                {{ messages[1] }}
+                            </div>
+                            {% endif %}
+                        {% endif %}
+                    {% endwith %}
+
+                    <div class="table-container">
+                        <table class="table is-fullwidth is-hoverable">
+                            <thead>
+                                <tr>
+                                    <th>Container ID</th>
+                                    <th>Container Name</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for c in list %}
+                                <tr>
+                                    <td>{{ c.id }}</td>
+                                    <td>{{ c.container_name }}</td>
+                                    <td>
+                                        <form method="POST" action="{{ url_for('main.profile') }}">
+                                            <input type="hidden" name="container_id" value="{{ c.id }}">
+                                            <button type="submit" name="run_btn" class="button is-small is-success" title="Run Container">
+                                                <span class="icon">
+                                                    <i class="fas fa-play"></i>
+                                                </span>
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

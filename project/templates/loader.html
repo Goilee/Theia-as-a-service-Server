@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- Мета-редирект -->
+<meta http-equiv="refresh" content="{{ delay }};url={{ redirect_url }}">
+<div class="loader-container">
+    <div class="loader"></div>
+    <h2 class="title is-4 mt-5 has-text-white">
+        <i class="fas fa-cog fa-spin mr-3"></i>Your container is loading...
+    </h2>
+    <p class="has-text-light">Please wait while we prepare your environment</p>
+</div>
+
+<style>
+    .loader,
+    .loader:after {
+        border-radius: 50%;
+        width: 8em;
+        height: 8em;
+    }
+    
+    .loader {
+        border-top: 1.1em solid rgba(255, 255, 255, 0.2);
+        border-right: 1.1em solid rgba(255, 255, 255, 0.2);
+        border-bottom: 1.1em solid rgba(255, 255, 255, 0.2);
+        border-left: 1.1em solid #ffffff;
+        animation: load8 1.1s infinite linear;
+    }
+    
+    @keyframes load8 {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+    
+    .fa-cog.fa-spin {
+        animation: fa-spin 2s infinite linear;
+    }
+</style>
+{% endblock %}

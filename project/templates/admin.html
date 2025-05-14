@@ -1,0 +1,262 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="columns is-centered">
+        <div class="column is-10">
+            <!-- Вкладки для навигации -->
+            <div class="tabs is-centered is-boxed">
+                <ul>
+                    <li class="{% if active_tab == 'users' %}is-active{% endif %}">
+                        <a href="{{ url_for('admin.user_management') }}">
+                            <span class="icon is-small"><i class="fas fa-users"></i></span>
+                            <span>Users Manager</span>
+                        </a>
+                    </li>
+                    <li class="{% if active_tab == 'containers' %}is-active{% endif %}">
+                        <a href="{{ url_for('admin.container_management') }}">
+                            <span class="icon is-small"><i class="fas fa-server"></i></span>
+                            <span>Containers Manager</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="card">
+                <div class="card-content">
+                    <!-- Заголовок в зависимости от активной вкладки -->
+                    <h1 class="title is-3 has-text-centered">
+                        {% if active_tab == 'users' %}
+                            <i class="fas fa-users-cog mr-3"></i>User Management
+                        {% else %}
+                            <i class="fas fa-server mr-3"></i>Container Management
+                        {% endif %}
+                    </h1>
+
+                    <!-- Содержимое Users Manager -->
+                    {% if active_tab == 'users' %}
+                    <div class="table-container">
+                        <table class="table is-fullwidth is-hoverable">
+                            <thead>
+                                <tr>
+                                    <th>Email</th>
+                                    <th>Name</th>
+                                    <th>Role</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for user in users %}
+                                <tr>
+                                    <td>{{ user.email }}</td>
+                                    <td>{{ user.name }}</td>
+                                    <td>
+                                        <form method="POST" action="{{ url_for('admin.change_role', user_id=user.id) }}">
+                                            <div class="field has-addons">
+                                                <div class="control is-expanded">
+                                                    <div class="select is-fullwidth">
+                                                        <select name="role" class="is-fullwidth">
+                                                            {% for role in ['User', 'Administrator'] %}
+                                                            <option value="{{ role }}" {% if user.role == role %}selected{% endif %}>
+                                                                {{ role }}
+                                                            </option>
+                                                            {% endfor %}
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="control">
+                                                    <button class="button is-info" type="submit">
+                                                        <i class="fas fa-save"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </td>
+                                    <td>
+                                        <form method="POST" action="{{ url_for('admin.delete_user', user_id=user.id) }}">
+                                            <button class="button is-danger" type="submit"
+                                                    onclick="return confirm('Are you sure you want to delete this user?')">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="buttons is-centered mb-5">
+                        <a href="{{ url_for('admin.create_user') }}" class="button is-success">
+                            <i class="fas fa-user-plus mr-2"></i>Create New User
+                        </a>
+                    </div>
+                    {% endif %}
+
+                    <!-- Содержимое Containers Manager -->
+                    {% if active_tab == 'containers' %}
+                    <div class="table-container">
+                        <table class="table is-fullwidth is-hoverable">
+                            <thead>
+                                <tr>
+                                    <th>Container ID</th>
+                                    <th>Name</th>
+                                    <th>Port</th>
+                                    <th>Created</th>
+                                    <th>Users</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for container in containers %}
+                                <tr>
+                                    <td>{{ container.id }}</td>
+                                    <td>
+                                        <div class="is-flex is-align-items-center">
+                                            <span id="container-name-{{ container.id }}">{{ container.container_name }}</span>
+                                            {% if container.container_type == 'Regular' %}
+                                                <button class="button is-small is-white ml-2 edit-name-btn"
+                                                        data-container-id="{{ container.id }}"
+                                                        title="Edit name">
+                                                    <span class="icon">
+                                                        <i class="fas fa-pencil-alt"></i>
+                                                    </span>
+                                                </button>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                    <td>{{ container.port }}</td>
+                                    <td>{{ container.date.strftime('%Y-%m-%d %H:%M') }}</td>
+                                    <td>
+                                        {% for link in container.user_links %}
+                                            <div>{{ link.user.email }} ({{ link.container_role.value }})</div>
+                                        {% endfor %}
+                                    </td>
+                                    <td>
+                                        <div class="buttons are-small">
+                                            {% if container.container_type == 'Regular' %}
+                                                <a href="{{ url_for('admin.manage_container_users', container_id=container.id) }}"
+                                                   class="button is-info" title="Manage Users">
+                                                    <span class="icon">
+                                                        <i class="fas fa-user-plus"></i>
+                                                    </span>
+                                                </a>
+                                                <form method="POST" action="{{ url_for('admin.delete_container', container_id=container.id) }}">
+                                                    <button class="button is-danger" type="submit"
+                                                            onclick="return confirm('Are you sure you want to delete this container?')"
+                                                            title="Delete Container">
+                                                        <span class="icon">
+                                                            <i class="fas fa-trash-alt"></i>
+                                                        </span>
+                                                    </button>
+                                                </form>
+                                            {% else %}
+                                                <form method="POST" action="{{ url_for('admin.reset_guest_container') }}">
+                                                    <button class="button is-warning" type="submit"
+                                                            onclick="return confirm('Are you sure you want to reset guest container?')"
+                                                            title="Reset Guest Container">
+                                                        <span class="icon">
+                                                            <i class="fas fa-sync-alt"></i>
+                                                        </span>
+                                                    </button>
+                                                </form>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="buttons is-centered mb-5">
+                        <a href="{{ url_for('admin.create_container') }}" class="button is-success">
+                            <span class="icon">
+                                <i class="fas fa-plus"></i>
+                            </span>
+                            <span>Create New Container</span>
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно для редактирования имени контейнера -->
+<div class="modal" id="edit-name-modal">
+    <div class="modal-background"></div>
+    <div class="modal-card">
+        <header class="modal-card-head">
+            <p class="modal-card-title">Edit Container Name</p>
+            <button class="delete" aria-label="close"></button>
+        </header>
+        <section class="modal-card-body">
+            <div class="field">
+                <label class="label">New Name</label>
+                <div class="control">
+                    <input class="input" type="text" id="new-container-name" placeholder="Enter new name">
+                </div>
+            </div>
+        </section>
+        <footer class="modal-card-foot">
+            <button class="button is-success" id="save-name-btn">Save changes</button>
+            <button class="button cancel-btn">Cancel</button>
+        </footer>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    let currentContainerId = null;
+    const modal = document.getElementById('edit-name-modal');
+
+    // Обработчики для кнопок редактирования
+    document.querySelectorAll('.edit-name-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            currentContainerId = btn.dataset.containerId;
+            const currentName = document.getElementById(`container-name-${currentContainerId}`).textContent;
+            document.getElementById('new-container-name').value = currentName;
+            modal.classList.add('is-active');
+        });
+    });
+
+    // Закрытие модального окна
+    modal.querySelector('.delete').addEventListener('click', () => {
+        modal.classList.remove('is-active');
+    });
+
+    modal.querySelector('.cancel-btn').addEventListener('click', () => {
+        modal.classList.remove('is-active');
+    });
+
+    // Сохранение изменений
+    document.getElementById('save-name-btn').addEventListener('click', () => {
+        const newName = document.getElementById('new-container-name').value.trim();
+        if (newName && currentContainerId) {
+            fetch(`/admin/containers/rename/${currentContainerId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ name: newName })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById(`container-name-${currentContainerId}`).textContent = newName;
+                    modal.classList.remove('is-active');
+                } else {
+                    alert(data.message || 'Error updating name');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error updating name');
+            });
+        }
+    });
+});
+</script>
+{% endblock %}

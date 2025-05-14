@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="columns is-centered">
+    <div class="column is-6">
+        <div class="card">
+            <div class="card-content">
+                <h1 class="title is-3 has-text-centered">
+                    <i class="fas fa-user-plus mr-3"></i>Create New User
+                </h1>
+
+                <form method="POST">
+                    <div class="field">
+                        <label class="label">Email</label>
+                        <div class="control has-icons-left">
+                            <input class="input" type="email" name="email" placeholder="user@example.com" required>
+                            <span class="icon is-small is-left">
+                                <i class="fas fa-envelope"></i>
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <label class="label">Name</label>
+                        <div class="control has-icons-left">
+                            <input class="input" type="text" name="name" placeholder="Full Name" required>
+                            <span class="icon is-small is-left">
+                                <i class="fas fa-user"></i>
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <label class="label">Password</label>
+                        <div class="control has-icons-left">
+                            <input class="input" type="password" name="password" placeholder="Secure password" required>
+                            <span class="icon is-small is-left">
+                                <i class="fas fa-key"></i>
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <label class="label">Role</label>
+                        <div class="control has-icons-left">
+                            <div class="select is-fullwidth">
+                                <select name="role" required>
+                                    <option value="User">User</option>
+                                    <option value="Administrator">Administrator</option>
+                                </select>
+                            </div>
+                            <span class="icon is-small is-left">
+                                <i class="fas fa-user-tag"></i>
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <div class="buttons is-centered">
+                            <button type="submit" class="button is-primary is-medium">
+                                <i class="fas fa-user-plus mr-2"></i>Create User
+                            </button>
+                            <a href="{{ url_for('admin.user_management') }}" class="button is-light is-medium">
+                                <i class="fas fa-arrow-left mr-2"></i>Cancel
+                            </a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

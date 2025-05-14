@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="columns is-centered">
+    <div class="column is-6">
+        <div class="card">
+            <div class="card-content">
+                <h1 class="title is-3 has-text-centered">
+                    <i class="fas fa-server mr-3"></i>Create New Container
+                </h1>
+
+                <form method="POST">
+                    <div class="field">
+                        <label class="label">Container Name</label>
+                        <div class="control has-icons-left">
+                            <input class="input" type="text" name="container_name" placeholder="Enter container name" required>
+                            <span class="icon is-small is-left">
+                                <i class="fas fa-server"></i>
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <div class="buttons is-centered">
+                            <button type="submit" class="button is-primary is-medium">
+                                <i class="fas fa-plus mr-2"></i>Create Container
+                            </button>
+                            <a href="{{ url_for('admin.container_management') }}" class="button is-light is-medium">
+                                <i class="fas fa-arrow-left mr-2"></i>Cancel
+                            </a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
